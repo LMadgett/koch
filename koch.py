@@ -17,12 +17,19 @@ def get_new_lines(lines):
         new_lines.append((b, (x2, y2)))
     return new_lines
 
-def draw(lines):
+def draw():
+    #a = (200, 500)
+    #b = (800, 500)
+    #lines = [(a, b)]
+    lines = []
+    num_points = 0
+    prev_point = ()
+    point = ()
     pygame.init()
-    screen = pygame.display.set_mode((800, 600))
+    screen = pygame.display.set_mode((1000, 1000))
     screen.fill((255, 255, 255))
-    for (start, end) in lines:
-        pygame.draw.line(screen, (0, 0, 0), start, end, 2)
+    #for (start, end) in lines:
+        #pygame.draw.line(screen, (0, 0, 0), start, end, 2)
     updated = False
     pygame.display.flip()
     running = True
@@ -30,6 +37,17 @@ def draw(lines):
         for event in pygame.event.get():
             if event.type == pygame.QUIT:
                 running = False
+            if event.type == pygame.MOUSEBUTTONDOWN:
+                pos = pygame.mouse.get_pos()
+                prev_point = point
+                point = pos
+                num_points += 1
+                print(num_points)
+                print(num_points % 2)
+                if num_points != 0 and num_points % 2 == 0:
+                    lines.append((prev_point, point))
+                    updated = True
+                    print(f"added line from {prev_point} to {point}")
             if event.type == pygame.KEYDOWN:
                 if event.key == pygame.K_RIGHT:
                     lines = get_new_lines(lines)
@@ -41,8 +59,4 @@ def draw(lines):
             pygame.display.flip()
     pygame.quit()
 
-a = (200, 300)
-b = (600, 300)
-lines = [(a, b)]
-
-draw(lines)
+draw()
