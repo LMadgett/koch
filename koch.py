@@ -53,6 +53,7 @@ def draw():
                     lines = get_new_lines(lines)
                     updated = True
         if updated:
+            screen.fill((255, 255, 255))
             for (start, end) in lines:
                 pygame.draw.line(screen, (0, 0, 0), start, end, 2)
             updated = False
