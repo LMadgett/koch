@@ -33,21 +33,53 @@ def draw():
     updated = False
     pygame.display.flip()
     running = True
+    triangle_mode = False
     while running:
         for event in pygame.event.get():
             if event.type == pygame.QUIT:
                 running = False
-            if event.type == pygame.MOUSEBUTTONDOWN:
+            if event.type == pygame.KEYDOWN:
+                if event.key == pygame.K_t:
+                    # Switch to triangle mode
+                    triangle_mode = not triangle_mode
+                    triangle_points = []
+            if locals().get('triangle_mode', False) and event.type == pygame.MOUSEBUTTONDOWN:
                 pos = pygame.mouse.get_pos()
-                prev_point = point
-                point = pos
-                num_points += 1
-                print(num_points)
-                print(num_points % 2)
-                if num_points != 0 and num_points % 2 == 0:
-                    lines.append((prev_point, point))
+                triangle_points = locals().get('triangle_points', [])
+                triangle_points.append(pos)
+                if len(triangle_points) == 2:
+                    # Calculate triangle vertices
+                    center = triangle_points[0]
+                    vertex = triangle_points[1]
+                    dx = vertex[0] - center[0]
+                    dy = vertex[1] - center[1]
+                    r = math.sqrt(dx**2 + dy**2)
+                    angle0 = math.atan2(dy, dx)
+                    vertices = []
+                    for i in range(3):
+                        angle = angle0 + i * 2 * math.pi / 3
+                        x = center[0] + r * math.cos(angle)
+                        y = center[1] + r * math.sin(angle)
+                        vertices.append((x, y))
+                    # Add triangle edges to lines
+                    lines.append((vertices[0], vertices[1]))
+                    lines.append((vertices[1], vertices[2]))
+                    lines.append((vertices[2], vertices[0]))
                     updated = True
-                    print(f"added line from {prev_point} to {point}")
+                    triangle_points = []
+                    triangle_mode = False
+            if event.type == pygame.MOUSEBUTTONDOWN:
+                if not triangle_mode:
+                    pos = pygame.mouse.get_pos()
+                    prev_point = point
+                    point = pos
+                    num_points += 1
+                    print(num_points)
+                    print(num_points % 2)
+                    if num_points != 0 and num_points % 2 == 0:
+                        lines.append((prev_point, point))
+                        updated = True
+                        print(f"added line from {prev_point} to {point}")
             if event.type == pygame.KEYDOWN:
                 if event.key == pygame.K_RIGHT:
                     lines = get_new_lines(lines)
